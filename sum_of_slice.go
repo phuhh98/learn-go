@@ -8,6 +8,7 @@ func foo(sum *int, s ...int) int {
 	return *sum
 }
 
+//Bar function return sum of input []int
 func Bar(s []int) int {
 	var sum int
 	foo(&sum, s...)

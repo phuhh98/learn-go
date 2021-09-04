@@ -26,7 +26,7 @@ func incFunc(counter *int, wg *sync.WaitGroup) {
 	temp := *counter
 	//Gosched yields the processor, allowing other goroutines to run. It does not suspend the current goroutine, so execution resumes automatically.
 	runtime.Gosched()
-	temp += 1
+	temp++
 	*counter = temp
 	fmt.Println("Counter: ", *counter)
 	fmt.Println("Gorountines: ", runtime.NumGoroutine())

@@ -6,10 +6,9 @@ import (
 	"sync"
 )
 
-
 func main() {
 
-	exercise for concurency using WaitGroup
+	//exercise for concurency using WaitGroup
 	fmt.Println("started")
 	fmt.Println(runtime.NumCPU())
 	var wg sync.WaitGroup

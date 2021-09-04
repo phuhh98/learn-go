@@ -28,7 +28,7 @@ func incFunc(counter *int, mutex *sync.Mutex, wg *sync.WaitGroup) {
 	//counter here is the sharing variable between goroutines
 	mutex.Lock()
 	temp := *counter
-	temp += 1
+	temp++
 	*counter = temp
 	mutex.Unlock()
 	fmt.Println("Counter: ", temp)
