@@ -1,32 +1,56 @@
+// this one is similar to fan_OUT_IN.go except the initialization of a set of waitGroups before calling sub goroutine
+//other than call to add to waitGroup on goroutine creation
 package main
 
 import (
 	"fmt"
-	"runtime"
+	"math/rand"
 	"sync"
+	"time"
 )
 
 func main() {
-	var wg sync.WaitGroup
-	var counter int
-	const numGo int = 50
+	c1 := make(chan int)
+	c2 := make(chan int)
 
-	for i := 1; i < numGo; i++ {
-		wg.Add(1)
-		go incFunc(&counter, &wg)
+	go populate(c1)
+
+	go fanOutIn(c1, c2)
+
+	for v := range c2 {
+		fmt.Println(v)
 	}
 
-	wg.Wait()
-	fmt.Println("Counter final:", counter)
+	fmt.Println("about to exit")
 }
 
-func incFunc(counter *int, wg *sync.WaitGroup) {
-	temp := *counter
-	//Gosched yields the processor, allowing other goroutines to run. It does not suspend the current goroutine, so execution resumes automatically.
-	runtime.Gosched()
-	temp += 1
-	*counter = temp
-	fmt.Println("Counter: ", *counter)
-	fmt.Println("Gorountines: ", runtime.NumGoroutine())
-	wg.Done()
+func populate(c chan int) {
+	for i := 0; i < 100; i++ {
+		c <- i
+	}
+	close(c)
+}
+
+func fanOutIn(c1, c2 chan int) {
+	var wg sync.WaitGroup
+	const goroutines = 10
+	wg.Add(goroutines) // initialize a set of waitGroup for goroutines
+
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			for v := range c1 {
+				func(v2 int) {
+					c2 <- timeConsumingWork(v2)
+				}(v)
+			}
+			wg.Done() //remove a unit from waitGroup by calling wg.Done() on goroutine completion
+		}()
+	}
+	wg.Wait()
+	close(c2)
+}
+
+func timeConsumingWork(n int) int {
+	time.Sleep(time.Microsecond * time.Duration(rand.Intn(500)))
+	return n + rand.Intn(1000)
 }

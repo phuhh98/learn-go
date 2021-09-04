@@ -1,3 +1,5 @@
+// race condition occur when many shared memory threads/goroutines try to concurrently
+// read/write to a certain location in memory
 package main
 
 import (
